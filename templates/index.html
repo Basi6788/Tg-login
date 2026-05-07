@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aurora Bot King Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --aurora-glow: rgba(0, 255, 255, 0.3);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode {
+            background: radial-gradient(circle at top right, #1a1a2e, #16213e);
+            color: white;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .aurora-glow-btn {
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            box-shadow: 0 0 20px var(--aurora-glow);
+            transition: 0.3s;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body class="dark-mode p-5">
+
+    <header class="glass-card p-4 mb-6 flex justify-between items-center">
+        <h1 class="text-xl font-bold italic">👑 Uchiha Bot Father</h1>
+        <button onclick="toggleMode()" class="p-2 glass-card rounded-full">🌓</button>
+    </header>
+
+    
+
+    <section class="glass-card p-6 mb-6">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg"></div>
+            <div>
+                <h2 class="text-lg font-bold">Welcome, King Jani!</h2>
+                <p class="text-xs text-gray-400">ID: 154808764</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="bots-container" class="grid gap-4 mb-20">
+        <div class="glass-card p-4 border-l-4 border-cyan-400">
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-bold">@Alpha_Automate_Bot</span>
+                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Active</span>
+            </div>
+            <p class="text-xs text-gray-300 mb-1">API Key: <code class="text-cyan-300">72910...Xyz</code></p>
+            <div class="flex gap-2 mt-3">
+                <button class="text-xs aurora-glow-btn px-4 py-2 rounded-lg">Edit Bot</button>
+                <button class="text-xs bg-red-500/20 text-red-400 px-4 py-2 rounded-lg">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <button onclick="showCreateModal()" class="fixed bottom-28 right-8 w-14 h-14 rounded-full aurora-glow-btn text-2xl font-bold flex items-center justify-center">
+        +
+    </button>
+
+    <nav class="bottom-nav glass-card">
+        <button class="text-cyan-400">🏠</button>
+        <button>🤖</button>
+        <button>⚙️</button>
+        <button class="text-red-400">Logout</button>
+    </nav>
+
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+        // Logic for persistence and modals will go here
+    </script>
+</body>
+</html>

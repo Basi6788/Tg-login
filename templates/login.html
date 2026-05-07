@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Uchiha Bot King</title>
+    <title>Telegram Login - Uchiha King</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -11,7 +11,6 @@
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
-
         body {
             background: radial-gradient(circle at top right, #1a1a2e, #0f0c29, #16213e);
             color: white;
@@ -19,81 +18,158 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
         }
-
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.02);
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             padding: 40px 30px;
         }
-
         .aurora-input {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--glass-border);
             color: white;
             transition: all 0.3s ease;
         }
-
         .aurora-input:focus {
             outline: none;
             border-color: #00d2ff;
             box-shadow: 0 0 15px var(--aurora-glow);
         }
-
         .aurora-btn {
             background: linear-gradient(45deg, #00d2ff, #3a7bd5);
             box-shadow: 0 4px 15px var(--aurora-glow);
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
         }
-
         .aurora-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 210, 255, 0.6);
         }
-
-        .crown-icon {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-        }
+        /* Custom Scrollbar for Country List */
+        .country-list::-webkit-scrollbar { width: 5px; }
+        .country-list::-webkit-scrollbar-thumb { background: #00d2ff; border-radius: 5px; }
     </style>
 </head>
 <body>
 
     <div class="glass-card">
-        <div class="crown-icon">👑</div>
-        <h2 class="text-2xl font-bold text-center mb-2 tracking-wider">Uchiha Admin</h2>
-        <p class="text-center text-gray-400 text-sm mb-8">Access your Bot Empire</p>
+        <div class="text-center mb-6">
+            <div class="text-4xl mb-2 filter drop-shadow-[0_0_10px_rgba(0,210,255,0.8)]">👑</div>
+            <h2 class="text-2xl font-bold tracking-wider">Uchiha Connect</h2>
+            <p class="text-xs text-gray-400 mt-1">Link your Telegram via MTProto</p>
+        </div>
 
-        <form action="/login" method="POST" class="flex flex-col gap-5">
-            <div>
-                <label class="block text-xs text-cyan-400 mb-1 ml-1 uppercase tracking-wider">Admin ID</label>
-                <input type="text" name="username" placeholder="Enter your ID..." required
-                    class="aurora-input w-full px-4 py-3 rounded-xl">
+        <div id="step-phone">
+            <div class="relative mb-4">
+                <label class="block text-xs text-cyan-400 mb-1 uppercase tracking-wider">Country</label>
+                <input type="text" id="countrySearch" placeholder="Search country..." class="aurora-input w-full px-4 py-2 rounded-t-xl text-sm" onkeyup="filterCountries()">
+                <div class="aurora-input border-t-0 rounded-b-xl max-h-32 overflow-y-auto country-list absolute w-full z-10 hidden" id="countryDropdown">
+                    </div>
             </div>
 
-            <div>
-                <label class="block text-xs text-cyan-400 mb-1 ml-1 uppercase tracking-wider">Secret Key</label>
-                <input type="password" name="password" placeholder="••••••••" required
-                    class="aurora-input w-full px-4 py-3 rounded-xl">
+            <div class="mb-6 flex gap-2">
+                <input type="text" id="countryCode" value="+92" readonly class="aurora-input w-20 px-3 py-3 rounded-xl text-center font-bold text-cyan-300">
+                <input type="tel" id="phoneNumber" placeholder="300 1234567" class="aurora-input w-full px-4 py-3 rounded-xl tracking-widest">
             </div>
 
-            <button type="submit" class="aurora-btn w-full py-3 rounded-xl mt-4">
-                Enter Dashboard
+            <button onclick="sendCode()" id="btnSendCode" class="aurora-btn w-full py-3 rounded-xl uppercase font-bold tracking-widest">
+                Send OTP
             </button>
-        </form>
+        </div>
+
+        <div id="step-otp" class="hidden">
+            <div class="mb-6 text-center">
+                <p class="text-sm text-gray-300">Code sent to <span id="displayNumber" class="text-cyan-400 font-bold"></span></p>
+                <p class="text-xs text-red-400 mt-1 cursor-pointer hover:underline" onclick="goBack()">Wrong Number?</p>
+            </div>
+            
+            <div class="mb-6">
+                <input type="text" id="otpCode" placeholder="Enter 5-digit code" maxlength="5" class="aurora-input w-full px-4 py-3 rounded-xl text-center text-2xl tracking-[1em] font-bold">
+            </div>
+
+            <button onclick="verifyCode()" class="aurora-btn w-full py-3 rounded-xl uppercase font-bold tracking-widest">
+                Login
+            </button>
+        </div>
     </div>
 
+    <script>
+        // Country List Logic
+        const countries = [
+            { name: "Pakistan", code: "+92" },
+            { name: "India", code: "+91" },
+            { name: "United States", code: "+1" },
+            { name: "Indonesia", code: "+62" },
+            { name: "Bangladesh", code: "+880" },
+            { name: "United Kingdom", code: "+44" }
+        ];
+
+        const dropdown = document.getElementById('countryDropdown');
+        const searchInput = document.getElementById('countrySearch');
+
+        function populateCountries(list) {
+            dropdown.innerHTML = '';
+            list.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'px-4 py-2 hover:bg-cyan-500/30 cursor-pointer flex justify-between text-sm';
+                div.innerHTML = `<span>${c.name}</span> <span class="text-cyan-300">${c.code}</span>`;
+                div.onclick = () => {
+                    document.getElementById('countryCode').value = c.code;
+                    searchInput.value = c.name;
+                    dropdown.classList.add('hidden');
+                };
+                dropdown.appendChild(div);
+            });
+        }
+        
+        populateCountries(countries);
+
+        searchInput.addEventListener('focus', () => dropdown.classList.remove('hidden'));
+        document.addEventListener('click', (e) => {
+            if(e.target !== searchInput && e.target !== dropdown) dropdown.classList.add('hidden');
+        });
+
+        function filterCountries() {
+            const query = searchInput.value.toLowerCase();
+            const filtered = countries.filter(c => c.name.toLowerCase().includes(query) || c.code.includes(query));
+            populateCountries(filtered);
+            dropdown.classList.remove('hidden');
+        }
+
+        // Logic to switch steps
+        function sendCode() {
+            const fullNumber = document.getElementById('countryCode').value + document.getElementById('phoneNumber').value.replace(/\s+/g, '');
+            if(fullNumber.length < 8) return alert("Sahi number dal bhai!");
+            
+            // Yahan backend API call karni hai /api/send_code
+            document.getElementById('btnSendCode').innerText = "Sending...";
+            
+            // Demo delay simulating network request
+            setTimeout(() => {
+                document.getElementById('step-phone').classList.add('hidden');
+                document.getElementById('step-otp').classList.remove('hidden');
+                document.getElementById('displayNumber').innerText = fullNumber;
+            }, 1000);
+        }
+
+        function verifyCode() {
+            const otp = document.getElementById('otpCode').value;
+            if(otp.length !== 5) return alert("OTP 5 digits ka hota hai jani!");
+            // Yahan backend API call hogi /api/verify_code
+            alert("Login Successful! Redirecting to Dashboard...");
+            // window.location.href = '/dashboard';
+        }
+
+        function goBack() {
+            document.getElementById('step-otp').classList.add('hidden');
+            document.getElementById('step-phone').classList.remove('hidden');
+            document.getElementById('btnSendCode').innerText = "Send OTP";
+        }
+    </script>
 </body>
 </html>
